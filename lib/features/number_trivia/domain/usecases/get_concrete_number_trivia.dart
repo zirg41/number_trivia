@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
-import 'package:number_trivia/core/usecases/usecase.dart';
+import '../../../../core/usecases/usecase.dart';
 
 import '../entities/number_trivia.dart';
 import '../repositories/number_trivia_repository.dart';
