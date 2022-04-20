@@ -1,5 +1,8 @@
+import 'package:dartz/dartz.dart';
 import 'package:mockito/mockito.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:number_trivia/core/errors/exceptions.dart';
+import 'package:number_trivia/core/errors/failures.dart';
 import 'package:number_trivia/core/platform/network_info.dart';
 import 'package:number_trivia/features/number_trivia/data/datasources/number_trivia_local_datasource.dart';
 import 'package:number_trivia/features/number_trivia/data/datasources/number_trivia_remote_datasource.dart';
@@ -50,6 +53,57 @@ void main() {
         repository.getConcreteNumberTrivia(testNumber);
         //assert
         verify(mockNetworkInfo.isConnected);
+      });
+
+      group('device is online', () {
+        setUp(() {
+          when(mockNetworkInfo.isConnected).thenAnswer((_) async => true);
+        });
+
+        test(
+            'should return data when the call to remote datasource is successfull',
+            () async {
+          // arrange
+          when(mockRemoteDataSource.getConcreteNumberTrivia(any))
+              .thenAnswer((_) async => testNumberTriviaModel);
+          // act
+          final result = await repository.getConcreteNumberTrivia(testNumber);
+          // assert
+          verify(mockRemoteDataSource.getConcreteNumberTrivia(testNumber));
+          expect(result, equals(Right(testNumberTrivia)));
+        });
+
+        test(
+            'should cache the data locally when the call to remote datasource is successfull',
+            () async {
+          // arrange
+          when(mockRemoteDataSource.getConcreteNumberTrivia(any))
+              .thenAnswer((_) async => testNumberTriviaModel);
+          // act
+          await repository.getConcreteNumberTrivia(testNumber);
+          // assert
+          verify(mockRemoteDataSource.getConcreteNumberTrivia(testNumber));
+          verify(mockLocalDataSource.cacheNumberTrivia(testNumberTriviaModel));
+        });
+        test(
+            'should return ServerFailure the call to remote datasource is unsuccessfull',
+            () async {
+          // arrange
+          when(mockRemoteDataSource.getConcreteNumberTrivia(any))
+              .thenThrow(ServerException());
+          // act
+          final result = await repository.getConcreteNumberTrivia(testNumber);
+          // assert
+          verify(mockRemoteDataSource.getConcreteNumberTrivia(testNumber));
+          verifyZeroInteractions(mockLocalDataSource);
+          expect(result, equals(Left(ServerFailure())));
+        });
+      });
+
+      group('device is offline', () {
+        setUp(() {
+          when(mockNetworkInfo.isConnected).thenAnswer((_) async => false);
+        });
       });
     },
   );
