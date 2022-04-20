@@ -115,8 +115,22 @@ void main() {
             final result = await repository.getConcreteNumberTrivia(testNumber);
             //assert
             verifyZeroInteractions(mockRemoteDataSource);
-            verify(mockLocalDataSource);
+            verify(mockLocalDataSource.getLastNumberTrivia());
             expect(result, equals(Right(testNumberTrivia)));
+          },
+        );
+        test(
+          'should return CacheFailure when there is no cached data',
+          () async {
+            // arrange
+            when(mockLocalDataSource.getLastNumberTrivia())
+                .thenThrow(CacheException());
+            //act
+            final result = await repository.getConcreteNumberTrivia(testNumber);
+            //assert
+            verifyZeroInteractions(mockRemoteDataSource);
+            verify(mockLocalDataSource.getLastNumberTrivia());
+            expect(result, equals(Left(CacheFailure())));
           },
         );
       });
