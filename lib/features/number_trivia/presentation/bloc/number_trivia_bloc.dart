@@ -1,8 +1,11 @@
+import 'dart:math';
+
 import 'package:bloc/bloc.dart';
 import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:number_trivia/core/errors/failures.dart';
+import 'package:number_trivia/core/usecases/usecase.dart';
 
 import '../../../../core/util/input_converter.dart';
 import '../../domain/entities/number_trivia.dart';
@@ -28,7 +31,7 @@ class NumberTriviaBloc extends Bloc<NumberTriviaEvent, NumberTriviaState> {
     @required this.inputConverter,
   }) : super(Empty()) {
     on<NumberTriviaEvent>(
-      (event, emit) {
+      (event, emit) async {
         emit(Empty());
         if (event is GetTriviaForConcreteNumber) {
           final Either<Failure, int> inputEither =
@@ -48,6 +51,13 @@ class NumberTriviaBloc extends Bloc<NumberTriviaEvent, NumberTriviaState> {
               ));
             },
           );
+        } else if (event is GetTriviaForRandomNumber) {
+          emit(Loading());
+          final failureOrTrivia = await getRandomNumberTrivia(NoParams());
+          emit(failureOrTrivia.fold(
+            (failure) => Error(message: _mapFailureToMessage(failure)),
+            (trivia) => Loaded(trivia: trivia),
+          ));
         }
       },
     );

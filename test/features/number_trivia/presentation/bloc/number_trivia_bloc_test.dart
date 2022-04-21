@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:dartz/dartz.dart';
 import 'package:number_trivia/core/errors/failures.dart';
+import 'package:number_trivia/core/usecases/usecase.dart';
 import 'package:number_trivia/core/util/input_converter.dart';
 import 'package:number_trivia/features/number_trivia/domain/entities/number_trivia.dart';
 import 'package:number_trivia/features/number_trivia/domain/usecases/get_concrete_number_trivia.dart';
@@ -133,7 +134,7 @@ void main() {
       },
     );
     test(
-      'should emit [Loading, Error] with proper messagr for the error when getting data fails',
+      'should emit [Loading, Error] with proper message for the error when getting data fails',
       () async {
         //arrange
         setUpMockInputConvertterSuccess();
@@ -149,6 +150,77 @@ void main() {
             bloc.stream.asBroadcastStream().cast(), emitsInOrder(expected));
         //act
         bloc.add(const GetTriviaForConcreteNumber(tNumberStringFromUI));
+      },
+    );
+  });
+  group('GetTriviaForRandomNumber event', () {
+    final tNumberTrivia = NumberTrivia(text: 'text', number: 1);
+
+    test(
+      'should get data from random usecase',
+      () async {
+        //arrange
+        when(mockGetRandomNumberTriviaUseCase(any))
+            .thenAnswer((_) async => Right(tNumberTrivia));
+        //act
+        bloc.add(GetTriviaForRandomNumber());
+        await untilCalled(mockGetRandomNumberTriviaUseCase(any));
+        //assert
+        verify(mockGetRandomNumberTriviaUseCase(NoParams()));
+      },
+    );
+    test(
+      'should emit [Loading, Loaded] when data is gotten successfully',
+      () async {
+        //arrange
+        when(mockGetRandomNumberTriviaUseCase(any))
+            .thenAnswer((_) async => Right(tNumberTrivia));
+        //assert later
+        final expected = [
+          Empty(),
+          Loading(),
+          Loaded(trivia: tNumberTrivia),
+        ];
+        expectLater(
+            bloc.stream.asBroadcastStream().cast(), emitsInOrder(expected));
+        //act
+        bloc.add(GetTriviaForRandomNumber());
+      },
+    );
+    test(
+      'should emit [Loading, Error] when getting data fails',
+      () async {
+        //arrange
+        when(mockGetRandomNumberTriviaUseCase(any))
+            .thenAnswer((_) async => Left(ServerFailure()));
+        //assert later
+        final expected = [
+          Empty(),
+          Loading(),
+          const Error(message: SERVER_FAILURE_MESSAGE),
+        ];
+        expectLater(
+            bloc.stream.asBroadcastStream().cast(), emitsInOrder(expected));
+        //act
+        bloc.add(GetTriviaForRandomNumber());
+      },
+    );
+    test(
+      'should emit [Loading, Error] with proper messagr for the error when getting data fails',
+      () async {
+        //arrange
+        when(mockGetRandomNumberTriviaUseCase(any))
+            .thenAnswer((_) async => Left(ServerFailure()));
+        //assert later
+        final expected = [
+          Empty(),
+          Loading(),
+          const Error(message: SERVER_FAILURE_MESSAGE),
+        ];
+        expectLater(
+            bloc.stream.asBroadcastStream().cast(), emitsInOrder(expected));
+        //act
+        bloc.add(GetTriviaForRandomNumber());
       },
     );
   });
