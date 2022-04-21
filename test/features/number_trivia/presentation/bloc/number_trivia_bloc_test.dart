@@ -132,5 +132,24 @@ void main() {
         bloc.add(const GetTriviaForConcreteNumber(tNumberStringFromUI));
       },
     );
+    test(
+      'should emit [Loading, Error] with proper messagr for the error when getting data fails',
+      () async {
+        //arrange
+        setUpMockInputConvertterSuccess();
+        when(mockGetConcreteNumberTriviaUseCase(any))
+            .thenAnswer((_) async => Left(CacheFailure()));
+        //assert later
+        final expected = [
+          Empty(),
+          Loading(),
+          const Error(message: CACHE_FAILURE_MESSAGE),
+        ];
+        expectLater(
+            bloc.stream.asBroadcastStream().cast(), emitsInOrder(expected));
+        //act
+        bloc.add(const GetTriviaForConcreteNumber(tNumberStringFromUI));
+      },
+    );
   });
 }

@@ -43,7 +43,10 @@ class NumberTriviaBloc extends Bloc<NumberTriviaEvent, NumberTriviaState> {
               final failureOrTrivia =
                   await getConcreteNumberTrivia(Params(number: integer));
               emit(failureOrTrivia.fold(
-                (failure) => const Error(message: SERVER_FAILURE_MESSAGE),
+                (failure) => Error(
+                    message: failure is ServerFailure
+                        ? SERVER_FAILURE_MESSAGE
+                        : CACHE_FAILURE_MESSAGE),
                 (trivia) => Loaded(trivia: trivia),
               ));
             },
