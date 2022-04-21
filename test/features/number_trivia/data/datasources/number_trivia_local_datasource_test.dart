@@ -1,8 +1,8 @@
 import 'dart:convert';
-import 'dart:math';
 
 import 'package:mockito/mockito.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:number_trivia/core/errors/exceptions.dart';
 import 'package:number_trivia/features/number_trivia/data/datasources/number_trivia_local_datasource.dart';
 import 'package:number_trivia/features/number_trivia/data/models/number_trivia_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -35,6 +35,15 @@ void main() {
       // assert
       verify(mockSharedPreferences.getString(CACHED_NUMBER_TRIVIA));
       expect(result, tNumberTriviaModel);
+    });
+    test('should throw CacheException when there is not a cached value',
+        () async {
+      // arrange
+      when(mockSharedPreferences.getString(any)).thenReturn(null);
+      // act
+      final call = dataSource.getLastNumberTrivia;
+      // assert
+      expect(() => call(), throwsA(const TypeMatcher<CacheException>()));
     });
   });
 }
