@@ -28,8 +28,8 @@ void main() {
     mockInputConverter = MockInputConverter();
 
     bloc = NumberTriviaBloc(
-        getConcreteNumberTrivia: mockGetConcreteNumberTriviaUseCase,
-        getRandomNumberTrivia: mockGetRandomNumberTriviaUseCase,
+        getConcreteNumberTriviaUseCase: mockGetConcreteNumberTriviaUseCase,
+        getRandomNumberTriviaUseCase: mockGetRandomNumberTriviaUseCase,
         inputConverter: mockInputConverter);
   });
   // test('initialState should be Empty', () {

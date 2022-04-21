@@ -1,9 +1,9 @@
-import 'dart:math';
+// ignore_for_file: constant_identifier_names
 
 import 'package:bloc/bloc.dart';
 import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:meta/meta.dart';
 import 'package:number_trivia/core/errors/failures.dart';
 import 'package:number_trivia/core/usecases/usecase.dart';
 
@@ -21,13 +21,13 @@ const String INVALID_INPUT_FAILURE_MESSAGE =
     'Invalid Input - The number must be a positive inteher or zero';
 
 class NumberTriviaBloc extends Bloc<NumberTriviaEvent, NumberTriviaState> {
-  final GetConcreteNumberTrivia getConcreteNumberTrivia;
-  final GetRandomNumberTrivia getRandomNumberTrivia;
+  final GetConcreteNumberTrivia getConcreteNumberTriviaUseCase;
+  final GetRandomNumberTrivia getRandomNumberTriviaUseCase;
   final InputConverter inputConverter;
 
   NumberTriviaBloc({
-    @required this.getConcreteNumberTrivia,
-    @required this.getRandomNumberTrivia,
+    @required this.getConcreteNumberTriviaUseCase,
+    @required this.getRandomNumberTriviaUseCase,
     @required this.inputConverter,
   }) : super(Empty()) {
     on<NumberTriviaEvent>(
@@ -44,7 +44,7 @@ class NumberTriviaBloc extends Bloc<NumberTriviaEvent, NumberTriviaState> {
             (integer) async {
               emit(Loading());
               final failureOrTrivia =
-                  await getConcreteNumberTrivia(Params(number: integer));
+                  await getConcreteNumberTriviaUseCase(Params(number: integer));
               emit(failureOrTrivia.fold(
                 (failure) => Error(message: _mapFailureToMessage(failure)),
                 (trivia) => Loaded(trivia: trivia),
@@ -53,7 +53,8 @@ class NumberTriviaBloc extends Bloc<NumberTriviaEvent, NumberTriviaState> {
           );
         } else if (event is GetTriviaForRandomNumber) {
           emit(Loading());
-          final failureOrTrivia = await getRandomNumberTrivia(NoParams());
+          final failureOrTrivia =
+              await getRandomNumberTriviaUseCase(NoParams());
           emit(failureOrTrivia.fold(
             (failure) => Error(message: _mapFailureToMessage(failure)),
             (trivia) => Loaded(trivia: trivia),
