@@ -1,22 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:number_trivia/features/number_trivia/presentation/pages/number_trivia_page.dart';
 import 'injection_container.dart' as di;
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await di.init();
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key key}) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Empty app',
+      title: 'Number Trivia',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primaryColor: Colors.green,
+        accentColor: Colors.green,
       ),
-      home: const Scaffold(body: Center(child: Text("Empty page"))),
+      home: NumberTriviaPage(),
     );
   }
 }
