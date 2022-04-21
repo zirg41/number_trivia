@@ -48,6 +48,8 @@ void main() {
       () async {
         // arrange
         setUpMockInputConvertterSuccess();
+        when(mockGetConcreteNumberTriviaUseCase(any))
+            .thenAnswer((_) async => Right(tNumberTrivia));
         // act
         bloc.add(const GetTriviaForConcreteNumber(tNumberStringFromUI));
         await untilCalled(mockInputConverter.stringToUnsignedInteger(any));
@@ -89,6 +91,25 @@ void main() {
         //assert
         verify(
             mockGetConcreteNumberTriviaUseCase(Params(number: tNumberParsed)));
+      },
+    );
+    test(
+      'should emit [Loading, Loaded] when data is gotten successfully',
+      () async {
+        //arrange
+        setUpMockInputConvertterSuccess();
+        when(mockGetConcreteNumberTriviaUseCase(any))
+            .thenAnswer((_) async => Right(tNumberTrivia));
+        //assert later
+        final expected = [
+          Empty(),
+          Loading(),
+          Loaded(trivia: tNumberTrivia),
+        ];
+        expectLater(
+            bloc.stream.asBroadcastStream().cast(), emitsInOrder(expected));
+        //act
+        bloc.add(const GetTriviaForConcreteNumber(tNumberStringFromUI));
       },
     );
   });
