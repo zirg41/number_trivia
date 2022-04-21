@@ -46,4 +46,23 @@ void main() {
       expect(() => call(), throwsA(const TypeMatcher<CacheException>()));
     });
   });
+
+  group(
+    'cacheNumberTrivia',
+    () {
+      final tNumberTriviaModel = NumberTriviaModel(text: 'text', number: 1);
+      test(
+        'should call SharedPreferences to cache the data',
+        () async {
+          // act
+          dataSource.cacheNumberTrivia(tNumberTriviaModel);
+
+          // assert
+          final expectedJsonString = json.encode(tNumberTriviaModel.toJson());
+          verify(mockSharedPreferences.setString(
+              CACHED_NUMBER_TRIVIA, expectedJsonString));
+        },
+      );
+    },
+  );
 }

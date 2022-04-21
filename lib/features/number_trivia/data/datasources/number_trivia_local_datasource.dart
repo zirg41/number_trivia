@@ -1,9 +1,9 @@
 import 'dart:convert';
 
 import 'package:meta/meta.dart';
-import 'package:number_trivia/core/errors/exceptions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../../core/errors/exceptions.dart';
 import '../models/number_trivia_model.dart';
 
 abstract class NumberTriviaLocalDataSource {
@@ -16,6 +16,7 @@ abstract class NumberTriviaLocalDataSource {
   Future<void> cacheNumberTrivia(NumberTriviaModel triviaToCache);
 }
 
+// ignore: constant_identifier_names
 const CACHED_NUMBER_TRIVIA = 'CACHED_NUMBER_TRIVIA';
 
 class NumberTriviaLocalDataSourceImpl implements NumberTriviaLocalDataSource {
@@ -35,7 +36,7 @@ class NumberTriviaLocalDataSourceImpl implements NumberTriviaLocalDataSource {
 
   @override
   Future<void> cacheNumberTrivia(NumberTriviaModel triviaToCache) {
-    // TODO: implement cacheNumberTrivia
-    throw UnimplementedError();
+    return sharedPreferences.setString(
+        CACHED_NUMBER_TRIVIA, json.encode(triviaToCache.toJson()));
   }
 }
