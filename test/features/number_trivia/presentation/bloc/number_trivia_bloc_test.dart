@@ -34,21 +34,42 @@ void main() {
   //   expect(bloc., matcher)
   // });
   group('GetTriviaForConcreteNumber event', () {
-    const tNumberStringFromUI = '1';
+    const String tNumberStringFromUI = '1';
     const tNumberParsed = 1;
     final tNumberTrivia = NumberTrivia(text: 'text', number: 1);
 
     test(
-        'should call the InputConvertor to validate and convert the string to an insigned integer',
-        () async {
-      // arrange
-      when(mockInputConverter.stringToUnsignedInteger(any))
-          .thenReturn(const Right(tNumberParsed));
-      // act
-      bloc.add(const GetTriviaForConcreteNumber(tNumberStringFromUI));
-      await untilCalled(mockInputConverter.stringToUnsignedInteger(any));
-      // assert
-      verify(mockInputConverter.stringToUnsignedInteger(tNumberStringFromUI));
-    });
+      'should call the InputConverter to validate and convert the string to an insigned integer',
+      () async {
+        // arrange
+        when(mockInputConverter.stringToUnsignedInteger(any))
+            .thenReturn(const Right(tNumberParsed));
+        // act
+        bloc.add(const GetTriviaForConcreteNumber(tNumberStringFromUI));
+        await untilCalled(mockInputConverter.stringToUnsignedInteger(any));
+        // assert
+        verify(mockInputConverter.stringToUnsignedInteger(tNumberStringFromUI));
+      },
+    );
+    test(
+      'should emit [Error] when the input is invalid',
+      () async* {
+        // arrange
+        when(mockInputConverter.stringToUnsignedInteger(any))
+            .thenReturn(Left(InvalidInputFailure()));
+
+        // assert later
+        final expected = <NumberTriviaState>[
+          Empty(),
+          const Error(message: INVALID_INPUT_FAILURE_MESSAGE),
+        ];
+
+        expectLater(
+            bloc.stream.asBroadcastStream().cast(), emitsInOrder(expected));
+
+        // act
+        bloc.add(const GetTriviaForConcreteNumber(tNumberStringFromUI));
+      },
+    );
   });
 }

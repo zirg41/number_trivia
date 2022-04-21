@@ -1,13 +1,21 @@
 import 'package:bloc/bloc.dart';
+import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:number_trivia/core/util/input_converter.dart';
-import 'package:number_trivia/features/number_trivia/domain/entities/number_trivia.dart';
-import 'package:number_trivia/features/number_trivia/domain/usecases/get_concrete_number_trivia.dart';
-import 'package:number_trivia/features/number_trivia/domain/usecases/get_random_number_trivia.dart';
+import 'package:number_trivia/core/errors/failures.dart';
+
+import '../../../../core/util/input_converter.dart';
+import '../../domain/entities/number_trivia.dart';
+import '../../domain/usecases/get_concrete_number_trivia.dart';
+import '../../domain/usecases/get_random_number_trivia.dart';
 
 part 'number_trivia_event.dart';
 part 'number_trivia_state.dart';
+
+const String SERVER_FAILURE_MESSAGE = 'Server Failure';
+const String CACHE_FAILURE_MESSAGE = 'Cache Failure';
+const String INVALID_INPUT_FAILURE_MESSAGE =
+    'Invalid Input - The number must be a positive inteher or zero';
 
 class NumberTriviaBloc extends Bloc<NumberTriviaEvent, NumberTriviaState> {
   final GetConcreteNumberTrivia getConcreteNumberTrivia;
@@ -19,10 +27,22 @@ class NumberTriviaBloc extends Bloc<NumberTriviaEvent, NumberTriviaState> {
     @required this.getRandomNumberTrivia,
     @required this.inputConverter,
   }) : super(Empty()) {
-    on<NumberTriviaEvent>((event, emit) {
-      if (event is GetTriviaForConcreteNumber) {
-        inputConverter.stringToUnsignedInteger(event.numberString);
-      }
-    });
+    on<NumberTriviaEvent>(
+      (event, emit) {
+        if (event is GetTriviaForConcreteNumber) {
+          final Either<Failure, int> inputEither =
+              inputConverter.stringToUnsignedInteger(event.numberString);
+
+          inputEither.fold(
+            (failure) async* {
+              yield const Error(message: INVALID_INPUT_FAILURE_MESSAGE);
+            },
+            (integer) async* {
+              yield null;
+            },
+          );
+        }
+      },
+    );
   }
 }
