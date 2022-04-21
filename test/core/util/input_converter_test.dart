@@ -32,6 +32,14 @@ void main() {
           expect(result, Left(InvalidInputFailure()));
         },
       );
+      test(
+        'should return a Failure when the string is is negative integer',
+        () async {
+          const str = '-123';
+          final result = inputConverter.stringToUnsignedInteger(str);
+          expect(result, Left(InvalidInputFailure()));
+        },
+      );
     },
   );
 }
