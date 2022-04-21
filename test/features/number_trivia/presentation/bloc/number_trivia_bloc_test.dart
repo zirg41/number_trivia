@@ -16,18 +16,18 @@ class MockInputConverter extends Mock implements InputConverter {}
 
 void main() {
   NumberTriviaBloc bloc;
-  MockGetConcreteNumberTrivia mockGetConcreteNumberTrivia;
-  MockGetRandomNumberTrivia mockGetRandomNumberTrivia;
+  MockGetConcreteNumberTrivia mockGetConcreteNumberTriviaUseCase;
+  MockGetRandomNumberTrivia mockGetRandomNumberTriviaUseCase;
   MockInputConverter mockInputConverter;
 
   setUp(() {
-    mockGetConcreteNumberTrivia = MockGetConcreteNumberTrivia();
-    mockGetRandomNumberTrivia = MockGetRandomNumberTrivia();
+    mockGetConcreteNumberTriviaUseCase = MockGetConcreteNumberTrivia();
+    mockGetRandomNumberTriviaUseCase = MockGetRandomNumberTrivia();
     mockInputConverter = MockInputConverter();
 
     bloc = NumberTriviaBloc(
-        getConcreteNumberTrivia: mockGetConcreteNumberTrivia,
-        getRandomNumberTrivia: mockGetRandomNumberTrivia,
+        getConcreteNumberTrivia: mockGetConcreteNumberTriviaUseCase,
+        getRandomNumberTrivia: mockGetRandomNumberTriviaUseCase,
         inputConverter: mockInputConverter);
   });
   // test('initialState should be Empty', () {
@@ -69,6 +69,23 @@ void main() {
 
         // act
         bloc.add(const GetTriviaForConcreteNumber(tNumberStringFromUI));
+      },
+    );
+
+    test(
+      'should get data from concrete usecase',
+      () async {
+        //arrange
+        when(mockInputConverter.stringToUnsignedInteger(any))
+            .thenReturn(const Right(tNumberParsed));
+        when(mockGetConcreteNumberTriviaUseCase(any))
+            .thenAnswer((_) async => Right(tNumberTrivia));
+        //act
+        bloc.add(const GetTriviaForConcreteNumber(tNumberStringFromUI));
+        await untilCalled(mockGetConcreteNumberTriviaUseCase(any));
+        //assert
+        verify(
+            mockGetConcreteNumberTriviaUseCase(Params(number: tNumberParsed)));
       },
     );
   });
