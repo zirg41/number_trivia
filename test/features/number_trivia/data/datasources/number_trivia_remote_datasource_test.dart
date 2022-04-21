@@ -23,4 +23,41 @@ void main() {
       dataSource = NumberTriviaRemoteDataSourceImpl(client: mockHttpClient);
     },
   );
+
+  group(
+    'getConcreteNumberTrivia',
+    () {
+      const tNumber = 1;
+      final tNumberTriviaModel =
+          NumberTriviaModel.fromJson(json.decode(fixture('trivia.json')));
+      test(
+        '''should perform a GET request on a URL with number 
+        being the endpoint and with application/json header''',
+        () async {
+          // arrange
+          when(mockHttpClient.get(any, headers: anyNamed('headers')))
+              .thenAnswer(
+                  (_) async => http.Response(fixture('trivia.json'), 200));
+          // act
+          dataSource.getConcreteNumberTrivia(tNumber);
+          // assert
+          verify(mockHttpClient.get(Uri(path: 'http://numbersapi.com/$tNumber'),
+              headers: {'Content-Type': 'application/json'}));
+        },
+      );
+      test(
+        'should return NumberTrivia when the response code is 200(success)',
+        () async {
+          // arrange
+          when(mockHttpClient.get(any, headers: anyNamed('headers')))
+              .thenAnswer(
+                  (_) async => http.Response(fixture('trivia.json'), 200));
+          // act
+          final result = await dataSource.getConcreteNumberTrivia(tNumber);
+          // assert
+          expect(result, equals(tNumberTriviaModel));
+        },
+      );
+    },
+  );
 }
