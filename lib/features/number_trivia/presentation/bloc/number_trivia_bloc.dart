@@ -36,17 +36,14 @@ class NumberTriviaBloc extends Bloc<NumberTriviaEvent, NumberTriviaState> {
 
           inputEither.fold(
             (failure) {
-              emit(Error(message: INVALID_INPUT_FAILURE_MESSAGE));
+              emit(const Error(message: INVALID_INPUT_FAILURE_MESSAGE));
             },
             (integer) async {
               emit(Loading());
               final failureOrTrivia =
                   await getConcreteNumberTrivia(Params(number: integer));
               emit(failureOrTrivia.fold(
-                (failure) => Error(
-                    message: failure is ServerFailure
-                        ? SERVER_FAILURE_MESSAGE
-                        : CACHE_FAILURE_MESSAGE),
+                (failure) => Error(message: _mapFailureToMessage(failure)),
                 (trivia) => Loaded(trivia: trivia),
               ));
             },
@@ -54,5 +51,16 @@ class NumberTriviaBloc extends Bloc<NumberTriviaEvent, NumberTriviaState> {
         }
       },
     );
+  }
+
+  String _mapFailureToMessage(Failure failure) {
+    switch (failure.runtimeType) {
+      case ServerFailure:
+        return SERVER_FAILURE_MESSAGE;
+      case CacheFailure:
+        return CACHE_FAILURE_MESSAGE;
+      default:
+        return "Unexpected error";
+    }
   }
 }
