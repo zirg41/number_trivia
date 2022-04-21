@@ -21,7 +21,18 @@ void main() {
     () {
       test(
         'should forward the call to DataConnectionChecker.hasConnection',
-        () async {},
+        () async {
+          final tHasConnectionFuture = Future.value(true);
+          // arrange
+          when(mockDataConnectionChecker.hasConnection)
+              .thenAnswer((_) => tHasConnectionFuture);
+          // act
+          final result = networkInfoImpl.isConnected;
+          // assert
+          verify(mockDataConnectionChecker.hasConnection);
+          expect(result, tHasConnectionFuture);
+          ;
+        },
       );
     },
   );
