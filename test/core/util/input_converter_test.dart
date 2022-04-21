@@ -19,9 +19,17 @@ void main() {
       test(
         'should return an integer when the string represents an unsigned integet',
         () async {
-          final str = '123';
+          const str = '123';
           final result = inputConverter.stringToUnsignedInteger(str);
           expect(result, Right(123));
+        },
+      );
+      test(
+        'should return a Failure when the string is not an integer',
+        () async {
+          const str = '1.0';
+          final result = inputConverter.stringToUnsignedInteger(str);
+          expect(result, Left(InvalidInputFailure()));
         },
       );
     },

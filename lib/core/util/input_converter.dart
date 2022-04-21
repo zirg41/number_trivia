@@ -3,7 +3,11 @@ import 'package:number_trivia/core/errors/failures.dart';
 
 class InputConverter {
   Either<Failure, int> stringToUnsignedInteger(String str) {
-    return Right(int.parse(str));
+    try {
+      return Right(int.parse(str));
+    } on FormatException {
+      return Left(InvalidInputFailure());
+    }
   }
 }
 
