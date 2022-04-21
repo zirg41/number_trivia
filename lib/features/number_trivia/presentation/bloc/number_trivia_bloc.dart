@@ -20,7 +20,9 @@ class NumberTriviaBloc extends Bloc<NumberTriviaEvent, NumberTriviaState> {
     @required this.inputConverter,
   }) : super(Empty()) {
     on<NumberTriviaEvent>((event, emit) {
-      // TODO: implement event handler
+      if (event is GetTriviaForConcreteNumber) {
+        inputConverter.stringToUnsignedInteger(event.numberString);
+      }
     });
   }
 }
