@@ -24,6 +24,16 @@ void main() {
     },
   );
 
+  void setUpMockHttpClientSuccess200() {
+    when(mockHttpClient.get(any, headers: anyNamed('headers')))
+        .thenAnswer((_) async => http.Response(fixture('trivia.json'), 200));
+  }
+
+  void setUpMockHttpClientFailure404() {
+    when(mockHttpClient.get(any, headers: anyNamed('headers')))
+        .thenAnswer((_) async => http.Response("Something went wrong", 404));
+  }
+
   group(
     'getConcreteNumberTrivia',
     () {
@@ -35,9 +45,7 @@ void main() {
         being the endpoint and with application/json header''',
         () async {
           // arrange
-          when(mockHttpClient.get(any, headers: anyNamed('headers')))
-              .thenAnswer(
-                  (_) async => http.Response(fixture('trivia.json'), 200));
+          setUpMockHttpClientSuccess200();
           // act
           dataSource.getConcreteNumberTrivia(tNumber);
           // assert
@@ -49,13 +57,23 @@ void main() {
         'should return NumberTrivia when the response code is 200(success)',
         () async {
           // arrange
-          when(mockHttpClient.get(any, headers: anyNamed('headers')))
-              .thenAnswer(
-                  (_) async => http.Response(fixture('trivia.json'), 200));
+          setUpMockHttpClientSuccess200();
           // act
           final result = await dataSource.getConcreteNumberTrivia(tNumber);
           // assert
           expect(result, equals(tNumberTriviaModel));
+        },
+      );
+      test(
+        'should throw ServerException when response code 404 or other',
+        () async {
+          // arrange
+          setUpMockHttpClientFailure404();
+          // act
+          final call = dataSource.getConcreteNumberTrivia;
+          // assert
+          expect(() => call(tNumber),
+              throwsA(const TypeMatcher<ServerException>()));
         },
       );
     },
