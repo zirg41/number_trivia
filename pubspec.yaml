@@ -9,6 +9,7 @@ environment:
   sdk: ">=2.11.0 <3.0.0"
 
 dependencies:
+  connectivity_plus: ^2.3.0
   dartz: ^0.10.1
   data_connection_checker: ^0.3.4
   equatable: ^2.0.3
