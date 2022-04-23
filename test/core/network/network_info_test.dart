@@ -6,13 +6,13 @@ import 'package:number_trivia/core/network/network_info.dart';
 class MockDataConnectionChecker extends Mock implements DataConnectionChecker {}
 
 void main() {
-  NetworkInfoImpl networkInfoImpl;
+  NetworkInfoImplOld networkInfoImpl;
   MockDataConnectionChecker mockDataConnectionChecker;
 
   setUp(
     () {
       mockDataConnectionChecker = MockDataConnectionChecker();
-      networkInfoImpl = NetworkInfoImpl(mockDataConnectionChecker);
+      networkInfoImpl = NetworkInfoImplOld(mockDataConnectionChecker);
     },
   );
 
